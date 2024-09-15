@@ -2,10 +2,16 @@ import React, { useRef, useState } from "react";
 import Header from "./Header";
 import netflixBackground from "../assets/netflix-bg.jpg";
 import validateCredentials from "../utils/SignUpValidation";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebaseConfig";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(false);
-  const [error, setError] = useState({});
+  const [clientSideError, setClientSideError] = useState({});
+  const [serverSideError, setServerSideError] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   const name = useRef(null);
@@ -13,14 +19,61 @@ const Login = () => {
   const password = useRef(null);
 
   const handleClick = () => {
-    const credentails = validateCredentials(
-      name.current?.value,
+    if (isSignIn) {
+      const credentails = validateCredentials(
+        name.current?.value,
+        email.current?.value,
+        password.current?.value
+      );
+      setClientSideError(credentails);
+      setIsFormSubmitted(true);
+
+      const isValidCredentials = Object.values(clientSideError).every(
+        (val) => val === true
+      );
+      if (isValidCredentials) {
+        // SignUp logic
+        createUser();
+      }
+      // For invalid credentials, we are handling it with a customised error messages
+    } else {
+      // SignIn logic
+      loginUser();
+    }
+  };
+
+  // copied from firbase docs
+  const createUser = () =>
+    createUserWithEmailAndPassword(
+      auth,
       email.current?.value,
       password.current?.value
-    );
-    setError(credentails);
-    setIsFormSubmitted(true);
-  };
+    )
+      .then((userCredential) => {
+        const user = userCredential.user;
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+
+  // copied from firbase docs
+  const loginUser = () =>
+    signInWithEmailAndPassword(
+      auth,
+      email.current?.value,
+      password.current?.value
+    )
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setServerSideError(errorMessage);
+        console.log(errorCode + " - " + errorMessage);
+      });
 
   const toggleSignInForm = () => {
     setIsSignIn(!isSignIn);
@@ -28,17 +81,17 @@ const Login = () => {
 
   return (
     <div>
-      <div className="relative h-[100vh] xl">
+      <div className="relative h-[125vh]">
         <Header />
-        <div className="absolute inset-0 bg-black opacity-30 z-10"></div>
+        <div className="absolute inset-0 w-full h-full bg-black opacity-30 z-10"></div>
         <img
-          className="absolute inset-0 w-full h-full object-fill z-0"
+          className="absolute inset-0 w-full h-full object-cover z-0"
           src={netflixBackground}
           alt="Netflix Background"
         />
-        <div className="absolute inset-0 z-20 flex justify-center items-center">
-          <div className="w-3/4 sm:w-2/3 md:w-1/2 md:h-[70vh] lg:w-1/3 lg:h-[80vh] bg-black bg-opacity-75">
-            <div className="py-5 md:my-5 lg:my-0 lg:py-10 w-full flex flex-col items-center">
+        <div className="absolute inset-0 flex justify-center items-center">
+          <div className="z-20 w-3/4 sm:w-2/3 md:w-1/2 lg:w-1/3 bg-black bg-opacity-75 rounded">
+            <div className="py-2 md:my-2 lg:my-0 lg:py-5 w-full flex flex-col items-center">
               <p className="text-white text-3xl self-center mx-4 w-2/3 font-bold">
                 {!isSignIn ? "Sign In" : "Sign Up"}
               </p>
@@ -56,9 +109,9 @@ const Login = () => {
                     />
                     <span className="text-red text-red-600">
                       {isFormSubmitted &&
-                        (error.isNameEmpty
+                        (!clientSideError.nameNotEmpty
                           ? "Name cannot be empty"
-                          : !error.isNameRightLength
+                          : !clientSideError.isNameRightLength
                           ? "Name length should be between 2 and 20"
                           : "")}
                     </span>
@@ -73,15 +126,15 @@ const Login = () => {
                   />
                   <span className="text-red text-red-600">
                     {isFormSubmitted &&
-                      (error.isEmailEmpty
+                      (!clientSideError.emailNotEmpty
                         ? "Email cannot be empty"
-                        : !error.notStartWithNumber ||
-                          !error.notEndWithNumber ||
-                          !error.includesAtSymbol ||
-                          !error.includesDot ||
-                          !error.dotAfterAt ||
-                          !error.atNotFirstOrLast ||
-                          !error.dotNotLast
+                        : !clientSideError.notStartWithNumber ||
+                          !clientSideError.notEndWithNumber ||
+                          !clientSideError.includesAtSymbol ||
+                          !clientSideError.includesDot ||
+                          !clientSideError.dotAfterAt ||
+                          !clientSideError.atNotFirstOrLast ||
+                          !clientSideError.dotNotLast
                         ? "Not a valid email format"
                         : "")}
                   </span>
@@ -95,31 +148,28 @@ const Login = () => {
                   />
                   <span className="text-red text-red-600">
                     {isFormSubmitted &&
-                      (error.isPasswordEmpty
+                      (!clientSideError.passwordNotEmpty
                         ? "Password cannot be empty"
-                        : !error.isPasswordLongEnough
+                        : !clientSideError.isPasswordLongEnough
                         ? "Password length should be between 8 & 20"
-                        : !error.containsLetter
+                        : !clientSideError.containsLetter
                         ? "Password should contain alphabets"
-                        : !error.containsNumber
+                        : !clientSideError.containsNumber
                         ? "Password should contain numbers"
-                        : !error.containsSpecialChar
+                        : !clientSideError.containsSpecialChar
                         ? "Password should contain special chars"
                         : "")}
                   </span>
+                  <span className="text-red text-red-600">
+                    {serverSideError ? serverSideError : ""}
+                  </span>
                 </>
-                {isSignIn ? (
-                  <button
-                    onClick={() => handleClick()}
-                    className="px-4 py-2 m-2 md:m-[3] lg:m-4 w-full text-white font-bold bg-red-700 rounded"
-                  >
-                    Sign Up
-                  </button>
-                ) : (
-                  <button className="px-4 py-2 m-2 md:m-[3] lg:m-4 w-full text-white font-bold bg-red-700 rounded">
-                    Sign In
-                  </button>
-                )}
+                <button
+                  onClick={() => handleClick()}
+                  className="px-4 py-2 m-2 md:m-[3] lg:m-4 w-full text-white font-bold bg-red-700 rounded"
+                >
+                  {isSignIn ? "Sign Up" : "Sign In"}
+                </button>
               </form>
               {isSignIn ? (
                 <p className="w-2/3 text-center text-white">

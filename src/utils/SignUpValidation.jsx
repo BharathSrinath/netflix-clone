@@ -1,10 +1,10 @@
 const validateCredentials = (name, email, password) => {
   // Name validation
-  const isNameEmpty = name.length === 0;
+  const nameNotEmpty = name.length !== 0;
   const isNameRightLength = name.length >= 2 && name.length <= 20;
 
   // Email validation
-  const isEmailEmpty = email.length === 0;
+  const emailNotEmpty = email.length !== 0;
   const notStartWithNumber = isNaN(email[0]);
   const notEndWithNumber = isNaN(email[email.length - 1]);
   const includesAtSymbol = email.includes("@");
@@ -16,7 +16,7 @@ const validateCredentials = (name, email, password) => {
   const dotNotLast = dotIndex < email.length - 1;
 
   // Password validation
-  const isPasswordEmpty = password.length === 0;
+  const passwordNotEmpty = password.length !== 0;
   const isPasswordLongEnough = password.length >= 8;
   const containsLetter = [...password].some(
     (char) => isNaN(char) && /[a-zA-Z]/.test(char)
@@ -27,9 +27,9 @@ const validateCredentials = (name, email, password) => {
   );
 
   return {
-    isNameEmpty,
+    nameNotEmpty,
     isNameRightLength,
-    isEmailEmpty,
+    emailNotEmpty,
     notStartWithNumber,
     notEndWithNumber,
     includesAtSymbol,
@@ -37,7 +37,7 @@ const validateCredentials = (name, email, password) => {
     dotAfterAt,
     atNotFirstOrLast,
     dotNotLast,
-    isPasswordEmpty,
+    passwordNotEmpty,
     isPasswordLongEnough,
     containsLetter,
     containsNumber,
