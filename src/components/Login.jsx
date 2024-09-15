@@ -5,14 +5,22 @@ import validateCredentials from "../utils/SignUpValidation";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile
 } from "firebase/auth";
 import { auth } from "../utils/firebaseConfig";
+import { useDispatch } from "react-redux";
+import { addUser } from "../store/slices/usersSlice";
+import userIcon from '../assets/user-circle-svgrepo-com.svg'
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(false);
   const [clientSideError, setClientSideError] = useState({});
-  const [serverSideError, setServerSideError] = useState(false);
+  const [serverSideError, setServerSideError] = useState("");
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const name = useRef(null);
   const email = useRef(null);
@@ -42,38 +50,75 @@ const Login = () => {
     }
   };
 
-  // copied from firbase docs
-  const createUser = () =>
-    createUserWithEmailAndPassword(
-      auth,
-      email.current?.value,
-      password.current?.value
-    )
-      .then((userCredential) => {
-        const user = userCredential.user;
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
+  // copied from firbase docs and modified into async function
+  // Because we want the dispatch to be called only after the creation/udpation/sign-in process completed
+  const createUser = async () => {
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email.current?.value,
+        password.current?.value
+      );
+
+      const user = userCredential.user;
+      await updateProfile(auth.currentUser, {
+        displayName: name.current?.value,
+        photoURL: userIcon,
       });
 
-  // copied from firbase docs
-  const loginUser = () =>
-    signInWithEmailAndPassword(
-      auth,
-      email.current?.value,
-      password.current?.value
-    )
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setServerSideError(errorMessage);
-        console.log(errorCode + " - " + errorMessage);
-      });
+      dispatch(
+        addUser({
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+        })
+      );
+
+      navigate("/browse");
+
+    } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorCode + " - " + errorMessage);
+    }
+  };
+  
+  const loginUser = async () => {
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email.current?.value,
+        password.current?.value
+      );
+
+      const user = userCredential.user;
+
+      dispatch(
+        addUser({
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+        })
+      );
+
+      navigate("/browse");
+      
+    } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      if (errorCode === "auth/invalid-email") {
+        setServerSideError("User not found");
+      } else if (errorCode === "auth/invalid-credential") {
+        setServerSideError("Invalid Credentials");
+      }
+      console.log(errorCode + " - " + errorMessage);
+    }
+  };
+  
 
   const toggleSignInForm = () => {
     setIsSignIn(!isSignIn);
@@ -91,7 +136,7 @@ const Login = () => {
         />
         <div className="absolute inset-0 flex justify-center items-center">
           <div className="z-20 w-3/4 sm:w-2/3 md:w-1/2 lg:w-1/3 bg-black bg-opacity-75 rounded">
-            <div className="py-2 md:my-2 lg:my-0 lg:py-5 w-full flex flex-col items-center">
+            <div className="py-2 my-4 md:my-2 lg:py-5 w-full flex flex-col items-center">
               <p className="text-white text-3xl self-center mx-4 w-2/3 font-bold">
                 {!isSignIn ? "Sign In" : "Sign Up"}
               </p>
@@ -103,7 +148,7 @@ const Login = () => {
                   <>
                     <input
                       ref={name}
-                      className="p-4 m-2 md:m-[3] lg:m-4 w-full bg-black bg-opacity-20 border border-gray-600 rounded text-white"
+                      className="p-2 md:p-4 mx-2 my-4 w-full bg-black bg-opacity-20 border border-gray-600 rounded text-white"
                       type="text"
                       placeholder="Full Name"
                     />
@@ -120,7 +165,7 @@ const Login = () => {
                 <>
                   <input
                     ref={email}
-                    className="p-4 m-2 md:m-[3] lg:m-4 w-full bg-black bg-opacity-20 border border-gray-600 rounded text-white"
+                    className="p-2 md:p-4 mx-2 my-4 w-full bg-black bg-opacity-20 border border-gray-600 rounded text-white"
                     type="email"
                     placeholder="Email or mobile number"
                   />
@@ -142,7 +187,7 @@ const Login = () => {
                 <>
                   <input
                     ref={password}
-                    className="p-4 m-2 md:m-[3] lg:m-4 w-full bg-black bg-opacity-20  border border-gray-600 rounded text-white"
+                    className="p-2 md:p-4 mx-2 my-4 w-full bg-black bg-opacity-20  border border-gray-600 rounded text-white"
                     type="password"
                     placeholder="Password"
                   />
@@ -160,13 +205,13 @@ const Login = () => {
                         ? "Password should contain special chars"
                         : "")}
                   </span>
-                  <span className="text-red text-red-600">
+                  <span className="text-red text-red-600 text-center">
                     {serverSideError ? serverSideError : ""}
                   </span>
                 </>
                 <button
                   onClick={() => handleClick()}
-                  className="px-4 py-2 m-2 md:m-[3] lg:m-4 w-full text-white font-bold bg-red-700 rounded"
+                  className="px-2 py-2 md:px-4 mx-2 my-4 w-full text-white font-bold bg-red-700 rounded"
                 >
                   {isSignIn ? "Sign Up" : "Sign In"}
                 </button>
