@@ -5,13 +5,12 @@ import validateCredentials from "../utils/SignUpValidation";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  updateProfile
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebaseConfig";
 import { useDispatch } from "react-redux";
-import { addUser } from "../store/slices/usersSlice";
-import userIcon from '../assets/user-circle-svgrepo-com.svg'
-import { useNavigate } from "react-router-dom";
+import { addUser } from "../store/slices/userSlice";
+import userIcon from "../assets/user-icon.jpg";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(false);
@@ -20,7 +19,6 @@ const Login = () => {
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const name = useRef(null);
   const email = useRef(null);
@@ -50,75 +48,56 @@ const Login = () => {
     }
   };
 
-  // copied from firbase docs and modified into async function
-  // Because we want the dispatch to be called only after the creation/udpation/sign-in process completed
-  const createUser = async () => {
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email.current?.value,
-        password.current?.value
-      );
-
-      const user = userCredential.user;
-      await updateProfile(auth.currentUser, {
-        displayName: name.current?.value,
-        photoURL: userIcon,
+  // copied from firebase
+  const createUser = () =>
+    createUserWithEmailAndPassword(
+      auth,
+      email.current.value,
+      password.current.value
+    )
+      .then((userCredential) => {
+        const user = userCredential.user;
+        updateProfile(user, {
+          displayName: name.current.value,
+          photoURL: userIcon,
+        })
+          .then(() => {
+            const { uid, email, displayName, photoURL } = auth.currentUser;
+            dispatch(
+              addUser({
+                uid: uid,
+                email: email,
+                displayName: displayName,
+                photoURL: photoURL,
+              })
+            );
+          })
+          .catch((error) => {});
+      })
+      .catch((error) => {
+        // const errorCode = error.code;
+        // const errorMessage = error.message;
       });
 
-      dispatch(
-        addUser({
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-        })
-      );
-
-      navigate("/browse");
-
-    } catch (error) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode + " - " + errorMessage);
-    }
-  };
-  
-  const loginUser = async () => {
-
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email.current?.value,
-        password.current?.value
-      );
-
-      const user = userCredential.user;
-
-      dispatch(
-        addUser({
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-        })
-      );
-
-      navigate("/browse");
-      
-    } catch (error) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      if (errorCode === "auth/invalid-email") {
-        setServerSideError("User not found");
-      } else if (errorCode === "auth/invalid-credential") {
-        setServerSideError("Invalid Credentials");
-      }
-      console.log(errorCode + " - " + errorMessage);
-    }
-  };
-  
+  const loginUser = () =>
+    signInWithEmailAndPassword(
+      auth,
+      email.current.value,
+      password.current.value
+    )
+      .then((userCredential) => {
+        // Signed in
+        // const user = userCredential.user;
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        // const errorMessage = error.message;
+        if (errorCode === "auth/invalid-email") {
+          setServerSideError("User not found");
+        } else if (errorCode === "auth/invalid-credential") {
+          setServerSideError("Invalid Credentials");
+        }
+      });
 
   const toggleSignInForm = () => {
     setIsSignIn(!isSignIn);
