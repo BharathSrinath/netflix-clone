@@ -1,20 +1,26 @@
-import React from 'react'
-import Header from './Header'
-import useGetNowPlayingMovies from '../hooks/useGetNowPlayingMovies'
-import MainContainer from './MainContainer';
-import SecondaryContainer from './SecondaryContainer';
+import React from "react";
+import Header from "./Header";
+import useGetNowPlayingMovies from "../hooks/useGetNowPlayingMovies";
+import MainContainer from "./MainContainer";
+import SecondaryContainer from "./SecondaryContainer";
+import useGetPopularMovies from "../hooks/useGetPopularMovies";
+import useGetTopRatedMovies from "../hooks/useGetTopRatedMovies";
+import useGetUpcomingMovies from "../hooks/useGetUpcomingMovies";
 
 const Browse = () => {
-
-  const nowPlayingMovies = useGetNowPlayingMovies();
+  
+  useGetNowPlayingMovies();
+  useGetPopularMovies();
+  useGetTopRatedMovies();
+  useGetUpcomingMovies();
 
   return (
     <div>
-      <Header/>
-      <MainContainer/>
-      <SecondaryContainer/>
+      <Header />
+      <MainContainer />
+      <SecondaryContainer />
     </div>
-  )
-}
+  );
+};
 
-export default Browse
+export default Browse;

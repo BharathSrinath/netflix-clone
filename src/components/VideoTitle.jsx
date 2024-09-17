@@ -4,7 +4,7 @@ import playIcon from '../assets/play-svgrepo-com.svg'
 
 const VideoTitle = ({title, overview}) => {
   return (
-    <div className='w-screen overflow-hidden aspect-video absolute bg-gradient-to-r from-black z-20 flex items-center'>
+    <div className='w-screen aspect-video overflow-hidden absolute bg-gradient-to-r from-black flex items-center'>
         <div className='w-1/2 p-[2%] text-white '>
             <h1 className='text-6xl font-bold'>{title}</h1>
             <p className='text-lg w-2/3'>{overview}</p>

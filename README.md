@@ -12,6 +12,7 @@
             # Redux Toolkit by default requires actions and state to be serializable. (We can change that if we want but with respect to our case we dont want to do that)
             # So later we just extracted the values needed such as userid, email, name and profilePic. With respect to passwords, they are securely managed by firebase and never accessible directly through the client-side or server-side code after a user is created or signed in. However there are function using which we can provide a feature for the user so that they can update the password.
             # IMPORTANT LESSON: In upcoming projects dont store your passwords in state/redux-store/local storage. (Here local storage is not same as browsers paswword manager)
+    # We are obtaining the data for the movies from TMDB where we have registered to get the API keys.
     # We are dividing the browse page into MainContainer and SecondaryContainer.
         # MainContainer: Video Trailer as the background and VideoTitle as the text overlaying on trailer.
         # SecondaryContainer: List of all the videos based on different conditions.
