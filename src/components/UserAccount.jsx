@@ -12,7 +12,6 @@ import { updateUser } from "../store/slices/userSlice";
 import { updateProfile } from "firebase/auth";
 import closeIcon from "../assets/close-svgrepo-com.svg";
 import editIcon from "../assets/edit-2-svgrepo-com.svg";
-import UpdateUserAccount from "./UpdateUserAccount";
 
 const UserAccount = () => {
   const userDetails = useSelector((store) => store.user);
@@ -191,7 +190,6 @@ const UserAccount = () => {
           </div>
         </div>
       </div>
-      {updateAccountSelected && <UpdateUserAccount />}
     </div>,
     document.querySelector(".user-account-modal")
   );
