@@ -1,29 +1,25 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import netflixLogo from "../assets/netflix-logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { auth } from "../utils/firebaseConfig";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, removeUser } from "../store/slices/userSlice";
+import Dropdown from "./Dropdown";
+import { openAccountSettings } from "../store/slices/accountSlice";
+import SearchBar from "./SearchBar";
+import { closeSearchView, openSearchView } from "../store/slices/searchSlice";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const path = useLocation();
+  const searchContainer = useRef();
+
+  const showSearch = useSelector((store) => store.search.showSearch);
 
   const homePath = path.pathname === "/";
   const browsePath = path.pathname === "/browse";
-
-  const user = useSelector((store) => store.user);
-
-  // copied from firebase
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {})
-      .catch((error) => {
-        navigate("/error");
-      });
-  };
 
   // The onAuthStateChanged method helps track the user's authentication status. If (user) is true, it means the user is signed in.
   // From the user object, we destructure uid, email, displayName, and photoURL, and dispatch an action. If the user doesn't exist (i.e., when logged out), we dispatch another action to remove the user.
@@ -58,35 +54,63 @@ const Header = () => {
     // eslint-disable-next-line
   }, []);
 
+  useEffect(() => {
+
+    if (showSearch) window.addEventListener("click", handleClickOutside);
+
+    return () => window.removeEventListener("click", handleClickOutside);
+    // eslint-disable-next-line
+  }, [showSearch]);
+
+  const handleClickOutside = (e) => {
+    if (searchContainer.current && !searchContainer.current.contains(e.target)) {
+      dispatch(closeSearchView()); 
+    }
+  };
+
+  const handleAccountClick = () => {
+    dispatch(openAccountSettings());
+  };
+
+  const handleSearchClick = (e) => {
+    e.stopPropagation();
+    dispatch(openSearchView());
+  };
+
   return (
-    // <div className="absolute inset-0 mx-auto z-30 sm:w-4/5 md:px-8 py-2 h-[15vh] flex items-center justify-between">
-    <div
-      className={`${
-        browsePath
-          ? "fixed top-0 bg-black w-screen"
-          : "absolute inset-0 sm:w-4/5 "
-      } mx-auto md:px-8 py-2 z-30 h-[15vh] flex items-center justify-between`}
-    >
-      <img className="w-48" src={netflixLogo} alt="Netflix Logo" />
-      {homePath && (
-        <Link to={"/login"}>
-          <button className="bg-red-700 text-white font-bold py-1 px-4 mx-4 rounded">
-            Sign In
-          </button>
-        </Link>
-      )}
-      {browsePath && (
-        <div className="flex">
-          <img className="w-8 h-8" src={user?.photoURL} alt="user icon" />
-          <button
-            onClick={() => handleLogout()}
-            className="bg-red-700 text-white font-bold py-1 px-4 mx-4 rounded"
-          >
-            Logout
-          </button>
+    <>
+      {showSearch ? (
+        <div ref={searchContainer}
+          id="searchBar"
+          className="fixed top-0 bg-black w-screen h-[12vh] mx-auto md:px-8 z-30 py-2 flex items-center justify-center"
+        >
+          <SearchBar />
+        </div>
+      ) : (
+        <div
+          className={`${
+            browsePath
+              ? "fixed top-0 bg-black w-screen h-[12vh]"
+              : "absolute inset-0 sm:w-4/5 h-[15vh]"
+          } mx-auto md:px-8 z-30 py-2 flex items-center justify-between`}
+        >
+          <img className="w-48" src={netflixLogo} alt="Netflix Logo" />
+          {homePath && (
+            <Link to={"/login"}>
+              <button className="bg-red-700 text-white font-bold py-1 px-4 mx-4 rounded">
+                Sign In
+              </button>
+            </Link>
+          )}
+          {browsePath && (
+            <Dropdown
+              handleSearchClick={(e) => handleSearchClick(e)}
+              handleAccountClick={() => handleAccountClick()}
+            />
+          )}
         </div>
       )}
-    </div>
+    </>
   );
 };
 

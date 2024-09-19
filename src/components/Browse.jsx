@@ -6,8 +6,14 @@ import SecondaryContainer from "./SecondaryContainer";
 import useGetPopularMovies from "../hooks/useGetPopularMovies";
 import useGetTopRatedMovies from "../hooks/useGetTopRatedMovies";
 import useGetUpcomingMovies from "../hooks/useGetUpcomingMovies";
+import { useSelector } from "react-redux";
+import UserAccount from "./UserAccount";
 
 const Browse = () => {
+
+  const isAccountSettingsOpen = useSelector(
+    (store) => store.account.isAccountSelected
+  );
   
   useGetNowPlayingMovies();
   useGetPopularMovies();
@@ -19,6 +25,7 @@ const Browse = () => {
       <Header />
       <MainContainer />
       <SecondaryContainer />
+      {isAccountSettingsOpen && <UserAccount />}
     </div>
   );
 };
