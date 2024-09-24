@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "./Header";
 import netflixBackground from "../assets/netflix-bg.jpg";
 import validateCredentials from "../utils/SignUpValidation";
@@ -8,11 +8,20 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebaseConfig";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../store/slices/userSlice";
 import userIcon from "../assets/user-icon.jpg";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const userIsLoggedIn = useSelector((store) => store.user.isLoggedIn);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    userIsLoggedIn && navigate("/browse");
+    // eslint-disable-next-line
+  }, []);
+
   const [isSignIn, setIsSignIn] = useState(false);
   const [clientSideError, setClientSideError] = useState({});
   const [serverSideError, setServerSideError] = useState("");
@@ -40,6 +49,7 @@ const Login = () => {
       if (isValidCredentials) {
         // SignUp logic
         createUser();
+        // updateUser();/
       }
       // For invalid credentials, we are handling it with a customised error messages
     } else {
@@ -48,36 +58,44 @@ const Login = () => {
     }
   };
 
-  // copied from firebase
-  const createUser = () =>
-    createUserWithEmailAndPassword(
-      auth,
-      email.current.value,
-      password.current.value
-    )
-      .then((userCredential) => {
-        const user = userCredential.user;
-        updateProfile(user, {
-          displayName: name.current.value,
-          photoURL: userIcon,
-        })
-          .then(() => {
-            const { uid, email, displayName, photoURL } = auth.currentUser;
-            dispatch(
-              addUser({
-                uid: uid,
-                email: email,
-                displayName: displayName,
-                photoURL: photoURL,
-              })
-            );
-          })
-          .catch((error) => {});
-      })
-      .catch((error) => {
-        // const errorCode = error.code;
-        // const errorMessage = error.message;
+  // copied from firebase but modified it as async
+  const createUser = async () => {
+    try {
+      // Create the user
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      );
+  
+      const user = userCredential.user;
+  
+      // Update the user profile after successful user creation
+      await updateProfile(user, {
+        displayName: name.current.value,
+        photoURL: userIcon,
       });
+  
+      // Get the updated user info from auth
+      const { uid, email: userEmail, displayName, photoURL } = auth.currentUser;
+  
+      // Dispatch the updated user information
+      dispatch(
+        addUser({
+          uid,
+          email: userEmail,
+          displayName,
+          photoURL,
+        })
+      );
+  
+      // Navigate to the desired route
+      navigate("/browse");
+    } catch (error) {
+      console.error("Error creating/updating user profile: ", error);
+    }
+  };
+  
 
   const loginUser = () =>
     signInWithEmailAndPassword(
@@ -87,7 +105,17 @@ const Login = () => {
     )
       .then((userCredential) => {
         // Signed in
-        // const user = userCredential.user;
+        const user = userCredential.user;
+        const { uid, email, displayName, photoURL } = user;
+        dispatch(
+          addUser({
+            uid: uid,
+            email: email,
+            displayName: displayName,
+            photoURL: photoURL,
+          })
+        );
+        navigate("/browse");
       })
       .catch((error) => {
         const errorCode = error.code;

@@ -9,12 +9,14 @@ const MainContainer = () => {
     const movies = useSelector((store) => store.movies?.nowPlayingMovies);
     
     if(!movies) return;
-    const mainMovie = movies[0];
+    
+    const randomIndex = Math.floor(Math.random() * movies.length);
+    const mainMovie = movies[randomIndex];
     const {original_title, overview, id} = mainMovie;
 
   return (
     <div className='bg-black relative'>
-        <VideoTitle title={original_title} overview={overview}/>
+        <VideoTitle title={original_title} overview={overview} movieId={id}/>
         <VideoBackground movieId={id}/>
     </div>
   )

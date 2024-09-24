@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import netflixBackground from "../assets/netflix-bg.jpg";
 import telivisionIcon from "../assets/telivision-core-small.svg";
 import downloadIcon from "../assets/download-core-small.svg";
@@ -6,10 +6,20 @@ import telescopeIcon from "../assets/telescope-core-small.svg";
 import profilesIcon from "../assets/profiles-core-small.svg";
 import Header from "./Header";
 import Footer from "./Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FAQ from "./FAQ";
+import { useSelector } from "react-redux";
 
 const Home = () => {
+  
+  const userIsLoggedIn = useSelector((store) => store.user.isLoggedIn);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    userIsLoggedIn && navigate("/browse");
+    // eslint-disable-next-line
+  }, [])
+  
   return (
     <div>
       <div className="relative h-[100vh] xl">

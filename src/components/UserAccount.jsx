@@ -19,10 +19,9 @@ const UserAccount = () => {
     (store) => store.account.isUpdateAccountSelected
   );
 
-  const [name, setName] = useState(userDetails.displayName);
-  const [email, setEmail] = useState(userDetails.email);
-  const [photoURL, setPhotoURL] = useState(userDetails.photoURL);
-  const [editPhotoInput, setEditPhotoInput] = useState(false); // Photo editing state
+  const [name, setName] = useState(userDetails.user.displayName);
+  const [photoURL, setPhotoURL] = useState(userDetails.user.photoURL);
+  const [editPhotoInput, setEditPhotoInput] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -44,6 +43,7 @@ const UserAccount = () => {
 
   const handleSaveDetails = () => {
     updateProfile(auth.currentUser, {
+      email: auth.currentUser.email,
       displayName: name,
       photoURL: photoURL,
     })
@@ -64,10 +64,6 @@ const UserAccount = () => {
 
   const handleNameChange = (e) => {
     setName(e.target.value);
-  };
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
   };
 
   const handlePhotoURLChange = (e) => {
@@ -102,7 +98,7 @@ const UserAccount = () => {
               <div className="relative w-14 h-14">
                 <img
                   className="absolute w-14 h-14"
-                  src={userDetails.photoURL || photoURL}
+                  src={userDetails.user.photoURL || photoURL}
                   alt="user icon"
                 />
                 {updateAccountSelected && (
@@ -154,7 +150,7 @@ const UserAccount = () => {
                   />
                 ) : (
                   <p className="border border-white p-2 rounded">
-                    {userDetails.displayName}
+                    {userDetails.user.displayName}
                   </p>
                 )}
               </div>
@@ -166,12 +162,11 @@ const UserAccount = () => {
                   <input disabled
                     className="border bg-neutral-700 border-white p-2 rounded"
                     type="email"
-                    value={email}
-                    onChange={handleEmailChange}
+                    value={auth.currentUser.email}
                   />
                 ) : (
                   <p className="border border-white p-2 rounded">
-                    {userDetails.email}
+                    {auth.currentUser.email}
                   </p>
                 )}
               </div>

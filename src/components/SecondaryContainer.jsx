@@ -19,6 +19,9 @@ const SecondaryContainer = () => {
         {movies.upcomingMovies && (
           <MovieList title="Upcoming" movies={movies.upcomingMovies} />
         )}
+        {movies.favouriteMovies.length >= 1 && (
+          <MovieList title="Favourites" movies={movies.favouriteMovies} />
+        )}
       </div>
     </div>
   );

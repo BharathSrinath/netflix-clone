@@ -21,6 +21,7 @@ const useHorizontalScroll = (scrollAmount = 10) => {
       element.addEventListener('wheel', onWheel);
       return () => element.removeEventListener('wheel', onWheel);
     }
+    // eslint-disable-next-line
   }, []);
 
   return scrollRef;
