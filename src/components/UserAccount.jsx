@@ -78,12 +78,12 @@ const UserAccount = () => {
   };
 
   return ReactDOM.createPortal(
-    <div>
+    <div className="flex justify-center items-center">
       <div
         onClick={handleClose}
         className="fixed inset-0 bg-gray-300 opacity-80"
       ></div>
-      <div className="w-1/2 h-[50vh] mx-auto text-white fixed inset-40 p-10 bg-neutral-800">
+      <div className="w-2/3 md:w-1/2 h-[55vh] md:h-[50vh] m-auto text-white fixed inset-0 p-10 bg-neutral-800">
         <div className="flex flex-col justify-between h-full">
           <img
             onClick={handleClose}

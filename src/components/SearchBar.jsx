@@ -48,7 +48,7 @@ const SearchBar = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const userQuery = await searchElement.current.value;
-    const searchTerm = `Consider that you are best movie recommender in the world. Suggest me some movies based on the query: ${userQuery}. You have to give me only 5 which are comma separated. There should be only commas and no spaces between each of the movies. No bullets, No numberings or anything of that sort. Just simple plain string like the example that I have given. Example result: Ghilli,Sivaji,Dhasavatharam,Asuran,Ayan`;
+    const searchTerm = `Consider that you are best movie recommender in the world. Suggest me some movies based on the query: ${userQuery}. You have to give me only 20 which are comma separated. There should be only commas and no spaces between each of the movies. No bullets, No numberings or anything of that sort. Just simple plain string like the example that I have given. Example result: Ghilli,Sivaji,Dhasavatharam,Asuran,Ayan`;
     if (searchTerm) {
       fetchWithUserQuery(searchTerm);
     }
