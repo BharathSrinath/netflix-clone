@@ -9,6 +9,7 @@ import useGetUpcomingMovies from "../hooks/useGetUpcomingMovies";
 import { useSelector } from "react-redux";
 import UserAccount from "./UserAccount";
 import { useNavigate } from "react-router-dom";
+import Footer from './Footer'
 
 const Browse = () => {
 
@@ -35,6 +36,7 @@ const Browse = () => {
       <Header />
       <MainContainer />
       <SecondaryContainer />
+      <Footer />
       {isAccountSettingsOpen && <UserAccount />}
     </div>
   );

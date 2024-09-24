@@ -5,6 +5,7 @@ import Header from "./Header";
 import UserAccount from "./UserAccount";
 import { IMAGE_CDN_URL } from "../utils/constants";
 import { nanoid } from "@reduxjs/toolkit";
+import Footer from "./Footer";
 
 const SearchResultsPage = () => {
   const navigate = useNavigate();
@@ -31,15 +32,15 @@ const SearchResultsPage = () => {
           <div className="flex flex-wrap justify-center" key={nanoid()}>
             {userQueriedMovies.map((moviesArrayDetails) =>
               moviesArrayDetails.map((movieArray) => (
-                <Link to={`/watch?id=${movieArray.id}`}>
+                <Link to={`/watch?id=${movieArray.id}`} key={movieArray.id}>
                   {movieArray.poster_path && (
-                  <div className="p-2 rounded-xl">
-                    <img
-                      className="h-64 w-48 rounded-xl"
-                      src={IMAGE_CDN_URL + movieArray.poster_path}
-                      alt="movie poster"
-                    />
-                  </div>
+                    <div className="p-2 rounded-xl">
+                      <img
+                        className="h-64 w-48 rounded-xl"
+                        src={IMAGE_CDN_URL + movieArray.poster_path}
+                        alt="movie poster"
+                      />
+                    </div>
                   )}
                 </Link>
               ))
@@ -48,6 +49,7 @@ const SearchResultsPage = () => {
         </div>
       )}
       {isAccountSettingsOpen && <UserAccount />}
+      <Footer />
     </div>
   );
 };

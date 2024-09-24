@@ -57,7 +57,6 @@ const UserAccount = () => {
         );
       })
       .catch((error) => {
-        console.log(error);
       });
     dispatch(saveAccountDetails());
   };

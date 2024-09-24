@@ -41,7 +41,6 @@ const SearchBar = () => {
     // searchMovie is an async function. So we get the results of the movies.
     // Rather moviesPromises will hold array of promises. That is why we have named it as moviesPromises in the first place.
     const moviesData = await Promise.all(moviesPromises);
-    console.log(moviesData);
     dispatch(addUserQueriedMovies(moviesData));
     dispatch(closeSearchView());
   };

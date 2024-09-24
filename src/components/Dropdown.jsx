@@ -58,7 +58,7 @@ function Dropdown({ handleSearchClick, handleAccountClick }) {
   ));
 
   return (
-    <div ref={divEl} className="flex w-1/5 justify-center items-center">
+    <div ref={divEl} className="flex w-1/4 sm:w-1/5 justify-center items-center">
       <img
         onClick={handleSearchClick}
         className="w-6 h-6 m-2 cursor-pointer font-bold"

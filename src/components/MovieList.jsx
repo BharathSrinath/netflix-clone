@@ -5,7 +5,6 @@ import useHorizontalScroll from "../hooks/useHorizontalScroll";
 const MovieList = ({ title, movies }) => {
   
   const scrollRef = useHorizontalScroll();
-  console.log(movies);
 
   return (
     <div className="px-6 mx-auto box-border">
