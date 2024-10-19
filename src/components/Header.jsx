@@ -54,7 +54,7 @@ const Header = () => {
         <div
           className={`${
             (browsePath || resultsPath || watchPath)
-              ? "fixed top-0 bg-black w-screen h-[12vh]"
+              ? "fixed top-0 bg-black w-screen h-[10vh]"
               : "absolute inset-0 sm:w-4/5 h-[15vh]"
           } mx-auto md:px-8 z-30 py-2 flex items-center justify-between`}
         >

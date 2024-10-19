@@ -13,7 +13,7 @@ const VideoBackground = ({movieId}) => {
   useGetMovieTrailer(movieId);
 
   return (
-    <div className={`${browsePath ? "w-screen -mt-30 md:-mt-10" : "w-full h-64 rounded m-1"}`}>
+    <div className={`${browsePath ? "w-screen bg-black" : "w-full h-64 rounded m-1"}`}>
       <iframe className={`${browsePath ? "w-screen aspect-video" : "w-full h-64 rounded"}`}
     // When the width is 100 view width, the height needs to be with respect to the width.
     // This is taken care by aspect-video which maintains 16:9 as the aspect ratio 

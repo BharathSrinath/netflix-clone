@@ -10,12 +10,11 @@ const MainContainer = () => {
     
     if(!movies) return;
     
-    const randomIndex = Math.floor(Math.random() * movies.length);
-    const mainMovie = movies[randomIndex];
+    const mainMovie = movies[0];
     const {original_title, overview, id} = mainMovie;
 
   return (
-    <div className='bg-black relative'>
+    <div className='bg-black relative mt-14 sm:mt-10 md:mt-0 lg:-mt-10'>
         <VideoTitle title={original_title} overview={overview} movieId={id}/>
         <VideoBackground movieId={id}/>
     </div>
